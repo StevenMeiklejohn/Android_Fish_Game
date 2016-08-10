@@ -101,7 +101,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Build an army of invaders
         numEnemies = 0;
-        for (int column = 0; column < 4; column++) {
+        for (int column = 0; column < 20; column++) {
             for (int row = 0; row < 5; row++) {
                 enemies[numEnemies] = new
                         Enemy(context, screenX, screenY);

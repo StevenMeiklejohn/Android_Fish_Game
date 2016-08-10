@@ -83,7 +83,7 @@ public class Enemy {
 
 //        x = column * (length + padding)+500;
 //        y = row * (length + padding/10)+150;
-        x = getRandomNumberInRange(500, screenX) + 1000;
+        x = getRandomNumberInRange(500, screenX*10);
         y = getRandomNumberInRange(50, screenY-50);
 
         // Initialize the bitmap
