@@ -6,6 +6,8 @@ package example.codeclan.com.turbofish;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,6 +37,10 @@ class TurboFishView extends SurfaceView implements Runnable {
 //    Instantiate the playerFish
     private PlayerFish playerFish;
 
+    private MovingBackGround bg_image;
+
+    private Bitmap backGround;
+
     // A boolean which we will set and unset
     // when the game is running- or not.
     volatile boolean playing;
@@ -48,7 +54,8 @@ class TurboFishView extends SurfaceView implements Runnable {
     private int ouchID = -1;
     private int wilhemlmID = -1;
 
-
+    private int mBGFarMoveX = 0;
+    private int mBGNearMoveX = 0;
 
     // The score
     private int score = 0;
@@ -83,7 +90,7 @@ class TurboFishView extends SurfaceView implements Runnable {
     private boolean paused = true;
 
     // Up to 500 enemies
-    private Enemy[] enemies = new Enemy[200];
+    private Enemy[] enemies = new Enemy[150];
     private int numEnemies = 0;
 
     // Up to 5 extra lives
@@ -111,6 +118,10 @@ class TurboFishView extends SurfaceView implements Runnable {
         // Initialize ourHolder and paint objects
         ourHolder = getHolder();
         paint = new Paint();
+
+        backGround = BitmapFactory.decodeResource(context.getResources(), R.drawable.undersea);
+
+        bg_image = new MovingBackGround(context);
 
 
         screenX = x;
@@ -158,6 +169,8 @@ class TurboFishView extends SurfaceView implements Runnable {
 
     }
 
+
+
     private void prepareLevel() {
 
         // Initialize all the game objects
@@ -167,7 +180,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Build an army of Enemies
         numEnemies = 0;
-        for (int column = 0; column < 15; column++) {
+        for (int column = 0; column < 7; column++) {
             for (int row = 0; row < 5; row++) {
                 enemies[numEnemies] = new
                         Enemy(context, screenX, screenY);
@@ -177,7 +190,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Build an army of Octopi
         numOctopi = 0;
-        for (int column = 0; column < 15; column++) {
+        for (int column = 0; column < 7; column++) {
             for (int row = 0; row < 5; row++) {
                 octopi[numOctopi] = new
                         Octopus(context, screenX, screenY);
@@ -187,7 +200,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Build an army of Snakes
         numSnakes = 0;
-        for (int column = 0; column < 15; column++) {
+        for (int column = 0; column < 7; column++) {
             for (int row = 0; row < 5; row++) {
                snakes[numSnakes] = new
                         Snake(context, screenX, screenY);
@@ -382,6 +395,25 @@ class TurboFishView extends SurfaceView implements Runnable {
         return r.nextInt((max - min) + 1) + min;
     }
 
+    private void doDrawRunning(Canvas canvas) {
+        // decrement the far background
+        mBGFarMoveX = mBGFarMoveX - 1;
+        // decrement the near background
+        mBGNearMoveX = mBGNearMoveX - 4;
+        // calculate the wrap factor for matching image draw
+        int newFarX = bg_image.getWidth() - (-mBGFarMoveX);
+        // if we have scrolled all the way, reset to start
+        if (newFarX <= 0) {
+            mBGFarMoveX = 0;
+            // only need one draw
+            canvas.drawBitmap(backGround, mBGFarMoveX, 0, null);
+        } else {
+            // need to draw original and wrap
+            canvas.drawBitmap(backGround, mBGFarMoveX, 0, null);
+            canvas.drawBitmap(backGround, newFarX, 0, null);
+        }
+    }
+
     // Draw the newly updated scene
     public void draw() {
 
@@ -391,7 +423,9 @@ class TurboFishView extends SurfaceView implements Runnable {
             canvas = ourHolder.lockCanvas();
 
             // Draw the background color
-            canvas.drawColor(Color.argb(255, 120, 160, 138));
+//            canvas.drawColor(Color.argb(255, 120, 160, 138));
+            doDrawRunning(canvas);
+
 
 
             // Choose the brush color for drawing
