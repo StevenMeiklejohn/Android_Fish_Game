@@ -9,6 +9,7 @@ import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
@@ -37,7 +38,7 @@ class TurboFishView extends SurfaceView implements Runnable {
     private PlayerFish playerFish;
 
 //    Instantiate an enemy
-    private Enemy enemy1;
+    private Enemy enemy;
 
     // A boolean which we will set and unset
     // when the game is running- or not.
@@ -234,24 +235,61 @@ class TurboFishView extends SurfaceView implements Runnable {
 //        // Has the player lost
 //        boolean lost = false;
 
+        // Update the player fish
+//        if(playerFish.getStatus()){
+            playerFish.update(fps);
+//        }
+
+//        // Update the player fish
+//        if(enemy.getStatus()){
+//            enemy.update(fps);
+//        }
+
+
         // Move the player's ship
 //        Log.d("Here", Integer.toString(screenY));
-        playerFish.update(fps);
+//        playerFish.update(fps);
 //
 //        enemy1.update(fps);
 
-        // Update all the invaders if visible
+        // Update all the sharks if visible
         for(int i = 0; i < numEnemies; i++) {
             if (enemies[i].getVisibility()) {
-                // Move the next invader
+                // Move the next shark
                 enemies[i].update(fps);
             }
         }
-//        // If bob is moving (the player is touching the screen)
-//        // then move him to the right based on his target speed and the current fps.
-//        if (isMoving) {
-//            bobXPosition = bobXPosition + (walkSpeedPerSecond / fps);
-//        }
+
+        // Has a player hit a shelter shark
+//        if(playerFish.getStatus()){
+            for(int i = 0; i < numEnemies; i++){
+                if(enemies[i].getVisibility()){
+                    if(RectF.intersects(playerFish.getRect(), enemies[i].getRect())){
+                        // A collision has occurred
+//                        playerFish.setInactive();
+                        enemies[i].setInvisible();
+                        lives = lives -1;
+                        soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
+                        // Is it game over?
+                        if(lives == 0){
+                            paused = true;
+                            lives = 3;
+                            score = 0;
+                            prepareLevel();
+
+                        }
+                    }
+                }
+            }
+
+//        Has player scored?
+            for (int i =0; i < numEnemies; i++){
+                if(enemies[i].getVisibility()){
+                    if(enemies[i].getX() <= screenX/4){
+                        score = score + 10;
+                    }
+                }
+            }
     }
 
     // Draw the newly updated scene
@@ -279,7 +317,7 @@ class TurboFishView extends SurfaceView implements Runnable {
                 }else{
                     canvas.drawBitmap(enemies[i].getBitmap2(), enemies[i].getX(), enemies[i].getY(), paint);
                     }
-                    }
+                }
             }
 
 
@@ -290,15 +328,19 @@ class TurboFishView extends SurfaceView implements Runnable {
 
             // Make the text a bit bigger
             paint.setTextSize(45);
-
-            // Display the current fps on the screen
-            canvas.drawText("FPS:" + fps, 20, 40, paint);
-
-            // Display the current player y position on the screen
-            canvas.drawText("Y:" + playerFish.getY(), 20, 100, paint);
 //
-//            // Draw bob at bobXPosition, 200 pixels
-//            canvas.drawBitmap(bitmapBob, bobXPosition, 200, paint);
+//            // Display the current fps on the screen
+//            canvas.drawText("FPS:" + fps, 20, 40, paint);
+//
+//            // Display the current player y position on the screen
+//            canvas.drawText("Y:" + playerFish.getY(), 20, 100, paint);
+
+            // Draw the score and remaining lives
+            // Change the brush color
+            paint.setColor(Color.argb(255,  249, 129, 0));
+            paint.setTextSize(40);
+            canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
+
 
             // Draw everything to the screen
             ourHolder.unlockCanvasAndPost(canvas);

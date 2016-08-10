@@ -32,13 +32,6 @@ public class Enemy {
     private float length;
     private float height;
 
-    private float randomX;
-    private float randomY;
-    private float previousRandomX;
-    private float previousRandomY;
-
-
-
     // X is the far left of the rectangle which forms our fish sprite
     private float x;
 
@@ -52,12 +45,14 @@ public class Enemy {
     public final int STOPPED = 0;
     public final int UP = 1;
     public final int LEFT = 2;
-//    public final int RIGHT = 2;
+
 
     // Is the playerFish moving and in which direction
     private int enemyMoving = STOPPED;
 
     boolean isVisible;
+
+    private boolean isActive;
 
 //    // Bob starts off not moving
 //    boolean isMoving = false;
@@ -69,23 +64,23 @@ public class Enemy {
         // Initialize a blank RectF
         rect = new RectF();
 
-//        length = 100;
-//        height = 80;
+        length = 100;
+        height = 70;
 
-        length = screenX / 12;
-        height = screenY / 12;
+//        length = screenX / 12;
+//        height = screenY / 12;
 
         isVisible = true;
 
 //        int padding = screenX / 25;
-        int padding = 20;
+//        int padding = 20;
 
 
 
 //        x = column * (length + padding)+500;
 //        y = row * (length + padding/10)+150;
         x = getRandomNumberInRange(500, screenX*10);
-        y = getRandomNumberInRange(50, screenY-50);
+        y = getRandomNumberInRange(50, screenY-100);
 
         // Initialize the bitmap
         bitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark);
@@ -137,6 +132,13 @@ public class Enemy {
 
     public float getY(){
         return y;
+    }
+
+    public boolean getStatus(){
+        return isActive;
+    }
+    public void setInactive(){
+        isActive = false;
     }
 
     private static int getRandomNumberInRange(int min, int max) {

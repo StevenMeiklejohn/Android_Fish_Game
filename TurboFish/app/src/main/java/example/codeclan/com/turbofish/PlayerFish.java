@@ -33,6 +33,8 @@ public class PlayerFish {
     // This will hold the pixels per second speed that the fish sprite will move
     private float playerSpeed;
 
+    private boolean isActive;
+
     // Which ways can the playerFish move
     public final int STOPPED = 0;
     public final int UP = 1;
@@ -53,7 +55,7 @@ public class PlayerFish {
         rect = new RectF();
 
         length = 10;
-        height = 10;
+        height = 5;
 
 //        length = screenX/10;
 //        height = screenY/10;
@@ -75,7 +77,7 @@ public class PlayerFish {
 //                false);
 
         // How fast is the playerShip in pixels per second
-        playerSpeed = 350;
+        playerSpeed = 200;
     }
 
     public RectF getRect(){
@@ -96,6 +98,14 @@ public class PlayerFish {
         return y;
     }
 
+    public boolean getStatus(){
+        return isActive;
+    }
+
+    public void setInactive(){
+        isActive = false;
+    }
+
 //    public float getScreenHeight(){
 //        return screenSizeY;
 //    }
@@ -104,9 +114,7 @@ public class PlayerFish {
 //        return length;
 //    }
 
-//    public RectF getRect(){
-//        return rect;
-//    }
+
 //
 //    // This is a getter method to make the rectangle that
 //    // defines our paddle available in BreakoutView class
