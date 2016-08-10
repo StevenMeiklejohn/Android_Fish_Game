@@ -55,6 +55,10 @@ class TurboFishView extends SurfaceView implements Runnable {
     // Game is paused at the start
     private boolean paused = true;
 
+    // Up to 60 invaders
+    private Enemy[] enemies = new Enemy[500];
+    private int numEnemies = 0;
+
 
     // When the we initialize (call new()) on gameView
     // This special constructor method runs
@@ -84,7 +88,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
     }
 
-    private void prepareLevel(){
+    private void prepareLevel() {
 
         // Here we will initialize all the game objects
 
@@ -92,7 +96,18 @@ class TurboFishView extends SurfaceView implements Runnable {
         playerFish = new PlayerFish(context, screenX, screenY);
 
 //        Make a new enemy fish
-        enemy1 = new Enemy(context, screenX, screenY);
+//        enemy1 = new Enemy(context, screenX, screenY);
+//    }
+
+        // Build an army of invaders
+        numEnemies = 0;
+        for (int column = 0; column < 4; column++) {
+            for (int row = 0; row < 5; row++) {
+                enemies[numEnemies] = new
+                        Enemy(context, screenX, screenY);
+                numEnemies++;
+            }
+        }
     }
 
     @Override
@@ -137,9 +152,16 @@ class TurboFishView extends SurfaceView implements Runnable {
         // Move the player's ship
 //        Log.d("Here", Integer.toString(screenY));
         playerFish.update(fps);
+//
+//        enemy1.update(fps);
 
-        enemy1.update(fps);
-
+        // Update all the invaders if visible
+        for(int i = 0; i < numEnemies; i++) {
+            if (enemies[i].getVisibility()) {
+                // Move the next invader
+                enemies[i].update(fps);
+            }
+        }
 //        // If bob is moving (the player is touching the screen)
 //        // then move him to the right based on his target speed and the current fps.
 //        if (isMoving) {
@@ -164,8 +186,15 @@ class TurboFishView extends SurfaceView implements Runnable {
             // Now draw the player fish
             canvas.drawBitmap(playerFish.getBitmap(), playerFish.getX(), playerFish.getY() - 50, paint);
 
-            // Now draw the enemy shark
-            canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY() - 50, paint);
+            // Draw the invaders
+            for(int i = 0; i < numEnemies; i++) {
+                if (enemies[i].getVisibility()) {
+                    canvas.drawBitmap(enemies[i].getBitmap(), enemies[i].getX(), enemies[i].getY(), paint);
+                }
+            }
+
+//            // Now draw the enemy shark
+//            canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY() - 50, paint);
 
             // Make the text a bit bigger
             paint.setTextSize(45);
