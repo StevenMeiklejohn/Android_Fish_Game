@@ -4,14 +4,19 @@ package example.codeclan.com.turbofish;
  * Created by user on 07/08/2016.
  */
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.IOException;
 
 
 // Notice we implement runnable so we have
@@ -37,6 +42,31 @@ class TurboFishView extends SurfaceView implements Runnable {
     // A boolean which we will set and unset
     // when the game is running- or not.
     volatile boolean playing;
+
+    // For sound FX
+    private SoundPool soundPool;
+    private int playerExplodeID = -1;
+    private int invaderExplodeID = -1;
+    private int shootID = -1;
+    private int damageShelterID = -1;
+    private int uhID = -1;
+    private int ohID = -1;
+
+    // The score
+    private int score = 0;
+
+    // Lives
+    private int lives = 3;
+
+    // How menacing should the sound be?
+    private long menaceInterval = 1000;
+    // Which menace sound should play next
+
+    // Which menace sound should play next
+    private boolean uhOrOh;
+
+    // When did we last play a menacing sound
+    private long lastMenaceTime = System.currentTimeMillis();
 
     // The size of the screen in pixels
     private int screenX;
@@ -82,6 +112,41 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Set our boolean to true - game on!
         playing = true;
+
+        // This SoundPool is deprecated but don't worry
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
+
+        try{
+            // Create objects of the 2 required classes
+            AssetManager assetManager = context.getAssets();
+            AssetFileDescriptor descriptor;
+
+            // Load our fx in memory ready for use
+            descriptor = assetManager.openFd("shoot.ogg");
+            shootID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("invaderexplode.ogg");
+            invaderExplodeID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("damageshelter.ogg");
+            damageShelterID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("playerexplode.ogg");
+            playerExplodeID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("damageshelter.ogg");
+            damageShelterID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("uh.ogg");
+            uhID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("oh.ogg");
+            ohID = soundPool.load(descriptor, 0);
+
+        }catch(IOException e){
+            // Print an error message to the console
+            Log.e("error", "failed to load sound files");
+        }
 
 
         prepareLevel();
@@ -131,6 +196,26 @@ class TurboFishView extends SurfaceView implements Runnable {
             timeThisFrame = System.currentTimeMillis() - startFrameTime;
             if (timeThisFrame > 0) {
                 fps = 1000 / timeThisFrame;
+            }
+
+            // We will do something new here towards the end of the project
+            // Play a sound based on the menace level
+            if(!paused) {
+                if ((startFrameTime - lastMenaceTime)> menaceInterval) {
+                    if (uhOrOh) {
+                        // Play Uh
+                        soundPool.play(uhID, 1, 1, 0, 0, 1);
+
+                    } else {
+                        // Play Oh
+                        soundPool.play(ohID, 1, 1, 0, 0, 1);
+                    }
+
+                    // Reset the last menace time
+                    lastMenaceTime = System.currentTimeMillis();
+                    // Alter value of uhOrOh
+                    uhOrOh = !uhOrOh;
+                }
             }
 
         }
@@ -189,9 +274,16 @@ class TurboFishView extends SurfaceView implements Runnable {
             // Draw the invaders
             for(int i = 0; i < numEnemies; i++) {
                 if (enemies[i].getVisibility()) {
-                    canvas.drawBitmap(enemies[i].getBitmap(), enemies[i].getX(), enemies[i].getY(), paint);
-                }
+                    if(uhOrOh) {
+                    canvas.drawBitmap(enemies[i].getBitmap1(), enemies[i].getX(), enemies[i].getY(), paint);
+                }else{
+                    canvas.drawBitmap(enemies[i].getBitmap2(), enemies[i].getX(), enemies[i].getY(), paint);
+                    }
+                    }
             }
+
+
+
 
 //            // Now draw the enemy shark
 //            canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY() - 50, paint);

@@ -22,7 +22,8 @@ public class Enemy {
     RectF rect;
 
     // The enemy will be represented by a Bitmap
-    private Bitmap bitmap;
+    private Bitmap bitmap1;
+    private Bitmap bitmap2;
 
     private float screenSizeY;
     private float screenSizeX;
@@ -87,11 +88,18 @@ public class Enemy {
         y = getRandomNumberInRange(50, screenY-50);
 
         // Initialize the bitmap
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark);
+        bitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark);
+        bitmap2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark_open);
 
 
         // stretch the first bitmap to a size appropriate for the screen resolution
-        bitmap = Bitmap.createScaledBitmap(bitmap,
+        bitmap1 = Bitmap.createScaledBitmap(bitmap1,
+                (int) (length),
+                (int) (height),
+                false);
+
+        // stretch the first bitmap to a size appropriate for the screen resolution
+        bitmap2 = Bitmap.createScaledBitmap(bitmap2,
                 (int) (length),
                 (int) (height),
                 false);
@@ -115,8 +123,12 @@ public class Enemy {
 
     // This is a getter method to make the rectangle that
     // defines our paddle available in BreakoutView class
-    public Bitmap getBitmap(){
-        return bitmap;
+    public Bitmap getBitmap1(){
+        return bitmap1;
+    }
+
+    public Bitmap getBitmap2(){
+        return bitmap2;
     }
 
     public float getX(){
