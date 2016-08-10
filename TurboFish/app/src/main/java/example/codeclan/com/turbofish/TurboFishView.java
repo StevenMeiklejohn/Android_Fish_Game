@@ -16,8 +16,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
 import java.io.IOException;
+import java.util.Random;
 
 
 // Implement runnable so we have
@@ -26,7 +26,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
     private Context context;
 
-    // This is our thread
+        // This is our thread
     private Thread gameThread = null;
 
     //Lock surface for use
@@ -44,6 +44,11 @@ class TurboFishView extends SurfaceView implements Runnable {
     private int playerExplodeID = -1;
     private int uhID = -1;
     private int ohID = -1;
+    private int crowd_cheerID = -1;
+    private int ouchID = -1;
+    private int wilhemlmID = -1;
+
+
 
     // The score
     private int score = 0;
@@ -78,8 +83,20 @@ class TurboFishView extends SurfaceView implements Runnable {
     private boolean paused = true;
 
     // Up to 500 enemies
-    private Enemy[] enemies = new Enemy[500];
+    private Enemy[] enemies = new Enemy[200];
     private int numEnemies = 0;
+
+    // Up to 5 extra lives
+    private ExtraLife[] extraLives = new ExtraLife[5];
+    private int numExtraLives = 0;
+
+    // Up to 500 octopi
+    private Octopus[] octopi = new Octopus[100];
+    private int numOctopi = 0;
+
+    // Up to 500 snakes
+    private Snake[] snakes = new Snake[100];
+    private int numSnakes = 0;
 
 
     // TurboFishView Constructor method
@@ -120,6 +137,17 @@ class TurboFishView extends SurfaceView implements Runnable {
             descriptor = assetManager.openFd("oh.ogg");
             ohID = soundPool.load(descriptor, 0);
 
+            descriptor = assetManager.openFd("crowd_cheer.mp3");
+            crowd_cheerID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("ouch.mp3");
+            ouchID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("wilhemlm.ogg");
+            wilhemlmID = soundPool.load(descriptor, 0);
+
+
+
         }catch(IOException e){
             // Print an error message to the console
             Log.e("error", "failed to load sound files");
@@ -139,13 +167,45 @@ class TurboFishView extends SurfaceView implements Runnable {
 
         // Build an army of Enemies
         numEnemies = 0;
-        for (int column = 0; column < 20; column++) {
+        for (int column = 0; column < 15; column++) {
             for (int row = 0; row < 5; row++) {
                 enemies[numEnemies] = new
                         Enemy(context, screenX, screenY);
                 numEnemies++;
             }
         }
+
+        // Build an army of Octopi
+        numOctopi = 0;
+        for (int column = 0; column < 15; column++) {
+            for (int row = 0; row < 5; row++) {
+                octopi[numOctopi] = new
+                        Octopus(context, screenX, screenY);
+                numOctopi++;
+            }
+        }
+
+        // Build an army of Snakes
+        numSnakes = 0;
+        for (int column = 0; column < 15; column++) {
+            for (int row = 0; row < 5; row++) {
+               snakes[numSnakes] = new
+                        Snake(context, screenX, screenY);
+                numSnakes++;
+            }
+        }
+
+        // Build extra lives
+        numExtraLives = 0;
+        for (int column = 0; column < 5; column++) {
+            for (int row = 0; row < 1; row++) {
+                extraLives[numExtraLives] = new
+                        ExtraLife(context, screenX, screenY);
+                numExtraLives++;
+            }
+        }
+
+
     }
 
     @Override
@@ -206,6 +266,30 @@ class TurboFishView extends SurfaceView implements Runnable {
             }
         }
 
+        // Update all the octopi if visible
+        for(int i = 0; i < numOctopi; i++) {
+            if (octopi[i].getVisibility()) {
+                // Move the next shark
+                octopi[i].update(fps);
+            }
+        }
+
+        // Update all the snakes if visible
+        for(int i = 0; i < numSnakes; i++) {
+            if (snakes[i].getVisibility()) {
+                // Move the next shark
+                snakes[i].update(fps);
+            }
+        }
+
+        // Update all the extra lives if visible
+        for(int i = 0; i < numExtraLives; i++) {
+            if (extraLives[i].getVisibility()) {
+                // Move the next shark
+                extraLives[i].update(fps);
+            }
+        }
+
         // Has player hit a shark
             for(int i = 0; i < numEnemies; i++){
                 if(enemies[i].getVisibility()){
@@ -213,7 +297,7 @@ class TurboFishView extends SurfaceView implements Runnable {
                         // A collision has occurred
                         enemies[i].setInvisible();
                         lives = lives -1;
-                        soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
+                        soundPool.play(wilhemlmID, 1, 1, 0, 0, 1);
                         // Is it game over?
                         if(lives == 0){
                             paused = true;
@@ -226,6 +310,59 @@ class TurboFishView extends SurfaceView implements Runnable {
                 }
             }
 
+        // Has player hit a snake
+        for(int i = 0; i < numSnakes; i++){
+            if(snakes[i].getVisibility()){
+                if(RectF.intersects(playerFish.getRect(), snakes[i].getRect())){
+                    // A collision has occurred
+                    snakes[i].setInvisible();
+                    lives = lives -1;
+                    soundPool.play(wilhemlmID, 1, 1, 0, 0, 1);
+                    // Is it game over?
+                    if(lives == 0){
+                        paused = true;
+                        lives = 3;
+                        score = 0;
+                        prepareLevel();
+
+                    }
+                }
+            }
+        }
+
+
+        // Has player hit an octopus
+        for(int i = 0; i < numOctopi; i++){
+            if(octopi[i].getVisibility()){
+                if(RectF.intersects(playerFish.getRect(), octopi[i].getRect())){
+                    // A collision has occurred
+                    octopi[i].setInvisible();
+                    lives = lives -1;
+                    soundPool.play(wilhemlmID, 1, 1, 0, 0, 1);
+                    // Is it game over?
+                    if(lives == 0){
+                        paused = true;
+                        lives = 3;
+                        score = 0;
+                        prepareLevel();
+
+                    }
+                }
+            }
+        }
+
+        // Has player hit an extra life
+        for(int i = 0; i < numExtraLives; i++){
+            if(extraLives[i].getVisibility()){
+                if(RectF.intersects(playerFish.getRect(), extraLives[i].getRect())){
+                    // A collision has occurred
+                    extraLives[i].setInvisible();
+                    lives = lives +1;
+                    soundPool.play(crowd_cheerID, 1, 1, 0, 0, 1);
+                }
+            }
+        }
+
 //        Has player scored?
             for (int i =0; i < numEnemies; i++){
                 if(enemies[i].getVisibility()){
@@ -234,6 +371,15 @@ class TurboFishView extends SurfaceView implements Runnable {
                     }
                 }
             }
+    }
+
+
+    private static int getRandomNumberInRange(int min, int max) {
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
     }
 
     // Draw the newly updated scene
@@ -245,7 +391,8 @@ class TurboFishView extends SurfaceView implements Runnable {
             canvas = ourHolder.lockCanvas();
 
             // Draw the background color
-            canvas.drawColor(Color.argb(255, 26, 128, 182));
+            canvas.drawColor(Color.argb(255, 120, 160, 138));
+
 
             // Choose the brush color for drawing
             paint.setColor(Color.argb(255,  255, 255, 255));
@@ -273,6 +420,39 @@ class TurboFishView extends SurfaceView implements Runnable {
                 }
             }
 
+            // Draw the octopi
+            for(int i = 0; i < numOctopi; i++) {
+                if (octopi[i].getVisibility()) {
+                    if(uhOrOh) {
+                        canvas.drawBitmap(octopi[i].getBitmap1(), octopi[i].getX(), octopi[i].getY(), paint);
+                    }else{
+                        canvas.drawBitmap(octopi[i].getBitmap2(), octopi[i].getX(), octopi[i].getY(), paint);
+                    }
+                }
+            }
+
+            // Draw the snakes
+            for(int i = 0; i < numSnakes; i++) {
+                if (snakes[i].getVisibility()) {
+                    if(uhOrOh) {
+                        canvas.drawBitmap(snakes[i].getBitmap1(), snakes[i].getX(), snakes[i].getY(), paint);
+                    }else{
+                        canvas.drawBitmap(snakes[i].getBitmap2(), snakes[i].getX(), snakes[i].getY(), paint);
+                    }
+                }
+            }
+
+            // Draw the extra lives
+            for(int i = 0; i < numExtraLives; i++) {
+                if (extraLives[i].getVisibility()) {
+                    if(uhOrOh) {
+                        canvas.drawBitmap(extraLives[i].getBitmap1(), extraLives[i].getX(), extraLives[i].getY(), paint);
+                    }else{
+                        canvas.drawBitmap(extraLives[i].getBitmap2(), extraLives[i].getX(), extraLives[i].getY(), paint);
+                    }
+                }
+            }
+
             // Make the text a bit bigger
             paint.setTextSize(45);
 
@@ -284,7 +464,7 @@ class TurboFishView extends SurfaceView implements Runnable {
 
             // Draw the score and remaining lives
             // Change the brush color
-            paint.setColor(Color.argb(255,  249, 129, 0));
+            paint.setColor(Color.argb(255,  0, 0, 0));
             paint.setTextSize(40);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
 

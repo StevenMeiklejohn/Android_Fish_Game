@@ -1,9 +1,14 @@
 package example.codeclan.com.turbofish;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Display;
+import android.widget.LinearLayout;
 
 
 public class TurboFishActivity extends Activity {
@@ -21,7 +26,6 @@ public class TurboFishActivity extends Activity {
         // Load the resolution into a Point object
         Point size = new Point();
         display.getSize(size);
-
 
         // Initialize gameView and set it as the view
         turboFishView = new TurboFishView(this, size.x, size.y);

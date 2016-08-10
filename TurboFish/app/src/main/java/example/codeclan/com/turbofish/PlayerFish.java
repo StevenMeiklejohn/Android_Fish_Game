@@ -136,7 +136,7 @@ public class PlayerFish {
 
         //Update rect which is used to detect hits
         rect.top = y;
-        rect.bottom = y + height;
+        rect.bottom = y;
         rect.left = x;
         rect.right = x + length;
     }
