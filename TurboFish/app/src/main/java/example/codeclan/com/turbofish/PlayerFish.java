@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
-import android.view.MotionEvent;
+
 
 /**
  * Created by user on 07/08/2016.
@@ -15,16 +15,18 @@ public class PlayerFish {
     RectF rect;
 
     // The playerFish will be represented by a Bitmap
-    private Bitmap bitmap;
+    private Bitmap bitmap1;
+    private Bitmap bitmap2;
 
+    // Screen Size
     private float screenSizeY;
     private float screenSizeX;
 
-//     How long and high our paddle will be
+    // Length and height of sprite
     private float length;
     private float height;
 
-    // X is the far left of the rectangle which forms our fish sprite
+    // X is the far left of the rectangle which forms the fish sprite
     private float x;
 
     // Y is the top coordinate
@@ -33,33 +35,31 @@ public class PlayerFish {
     // This will hold the pixels per second speed that the fish sprite will move
     private float playerSpeed;
 
+    // Fish sprite status
+
     private boolean isActive;
 
     // Which ways can the playerFish move
     public final int STOPPED = 0;
     public final int UP = 1;
-//    public final int RIGHT = 2;
+
 
     // Is the playerFish moving and in which direction
     private int playerMoving = STOPPED;
 
-//    // Bob starts off not moving
-//    boolean isMoving = false;
 
-    // This the the constructor method
-    // When we create an object from this class we will pass
-    // in the screen width and height
+
+    // PlayerFish constructor method
     public PlayerFish(Context context, int screenX, int screenY){
 
         // Initialize a blank RectF
         rect = new RectF();
 
-        length = 10;
-        height = 5;
+        // Define size of sprite
+        length = 70;
+        height = 50;
 
-//        length = screenX/10;
-//        height = screenY/10;
-
+        // Screen size passed in and converted
         screenSizeX = screenX;
         screenSizeY = screenY;
 
@@ -67,14 +67,21 @@ public class PlayerFish {
         x = screenX / 4;
         y = screenY / 2;
 
-        // Initialize the bitmap
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish2);
+        // Initialize the bitmaps
+        bitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_bitmap1);
+        bitmap2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.fish_bitmap2);
 
-        // stretch the bitmap to a size appropriate for the screen resolution
-//        bitmap = Bitmap.createScaledBitmap(bitmap,
-//                (int) (length),
-//                (int) (height),
-//                false);
+        //stretch the bitmap to a size appropriate for the screen resolution
+        bitmap1 = Bitmap.createScaledBitmap(bitmap1,
+                (int) (length),
+                (int) (height),
+                false);
+
+        //stretch the bitmap to a size appropriate for the screen resolution
+        bitmap2 = Bitmap.createScaledBitmap(bitmap2,
+                (int) (length),
+                (int) (height),
+                false);
 
         // How fast is the playerShip in pixels per second
         playerSpeed = 200;
@@ -84,10 +91,11 @@ public class PlayerFish {
         return rect;
     }
 
-    // This is a getter method to make the rectangle that
-    // defines our paddle available in BreakoutView class
-    public Bitmap getBitmap(){
-        return bitmap;
+    public Bitmap getBitmap1(){
+        return bitmap1;
+    }
+    public Bitmap getBitmap2(){
+        return bitmap2;
     }
 
     public float getX(){
@@ -106,64 +114,31 @@ public class PlayerFish {
         isActive = false;
     }
 
-//    public float getScreenHeight(){
-//        return screenSizeY;
-//    }
-
-//    public float getLength(){
-//        return length;
-//    }
 
 
-//
-//    // This is a getter method to make the rectangle that
-//    // defines our paddle available in BreakoutView class
-//    public Bitmap getBitmap(){
-//        return bitmap;
-//    }
-//
-//    public float getX(){
-//        return x;
-//    }
-//
-//    public float getLength(){
-//        return length;
-//    }
 
-//    // This method will be used to change/set if the paddle is going left, right or nowhere
+    //  Check if player is moving and in which direction
     public void setMovementState(int state){
         playerMoving = state;
     }
 
 
 
-    // This update method will be called from update in SpaceInvadersView
-    // It determines if the player ship needs to move and changes the coordinates
-    // contained in x if necessary
+    // All the updates
     public void update(long fps){
         if (playerMoving == UP && y > 40) {
                 y = y - playerSpeed / fps;
             }
 
-
         if(playerMoving == STOPPED && y < screenSizeY -20) {
                 y = y + playerSpeed / fps;
             }
 
-
-//         Update rect which is used to detect hits
+        //Update rect which is used to detect hits
         rect.top = y;
         rect.bottom = y + height;
         rect.left = x;
         rect.right = x + length;
-
     }
-
-
-
-
-
-
-
 }
 

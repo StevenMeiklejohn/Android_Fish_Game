@@ -4,13 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.RectF;
-import android.view.MotionEvent;
-
 import java.util.Random;
 
 /**
@@ -21,14 +14,12 @@ public class Enemy {
 
     RectF rect;
 
-    // The enemy will be represented by a Bitmap
+    // Enemy bitmap
     private Bitmap bitmap1;
     private Bitmap bitmap2;
 
-    private float screenSizeY;
-    private float screenSizeX;
 
-    //     How long and high our sprite will be
+    //Size of enemy sprite
     private float length;
     private float height;
 
@@ -43,46 +34,32 @@ public class Enemy {
 
     // Which ways can the enemy Fish move
     public final int STOPPED = 0;
-    public final int UP = 1;
-    public final int LEFT = 2;
 
-
-    // Is the playerFish moving and in which direction
+    // Is the enemy moving and in which direction
     private int enemyMoving = STOPPED;
 
     boolean isVisible;
 
     private boolean isActive;
 
-//    // Bob starts off not moving
-//    boolean isMoving = false;
 
-    // This the the constructor method
-    // When we create an object from this class we will pass
-    // in the screen width and height
+
+    //Enemy constructor
     public Enemy(Context context, int screenX, int screenY){
+
         // Initialize a blank RectF
         rect = new RectF();
 
         length = 100;
         height = 70;
 
-//        length = screenX / 12;
-//        height = screenY / 12;
-
         isVisible = true;
 
-//        int padding = screenX / 25;
-//        int padding = 20;
-
-
-
-//        x = column * (length + padding)+500;
-//        y = row * (length + padding/10)+150;
+        //randomize enemy spawn location
         x = getRandomNumberInRange(500, screenX*10);
         y = getRandomNumberInRange(50, screenY-100);
 
-        // Initialize the bitmap
+        // Initialize the bitmaps
         bitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark);
         bitmap2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.shark_open);
 
@@ -116,8 +93,7 @@ public class Enemy {
         return rect;
     }
 
-    // This is a getter method to make the rectangle that
-    // defines our paddle available in BreakoutView class
+    //Getters
     public Bitmap getBitmap1(){
         return bitmap1;
     }
@@ -142,80 +118,25 @@ public class Enemy {
     }
 
     private static int getRandomNumberInRange(int min, int max) {
-
         if (min >= max) {
             throw new IllegalArgumentException("max must be greater than min");
         }
-
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
     }
 
 
 
-//    public float getScreenHeight(){
-//        return screenSizeY;
-//    }
-
-//    public float getLength(){
-//        return length;
-//    }
-
-//    public RectF getRect(){
-//        return rect;
-//    }
-//
-//    // This is a getter method to make the rectangle that
-//    // defines our paddle available in BreakoutView class
-//    public Bitmap getBitmap(){
-//        return bitmap;
-//    }
-//
-//    public float getX(){
-//        return x;
-//    }
-//
-//    public float getLength(){
-//        return length;
-//    }
-
-    //    // This method will be used to change/set if the paddle is going left, right or nowhere
-//    public void setMovementState(int state){
-//        enemyMoving = state;
-//    }
-
-
-
-    // This update method will be called from update in SpaceInvadersView
-    // It determines if the player ship needs to move and changes the coordinates
-    // contained in x if necessary
+    //Updates
     public void update(long fps){
 
         x = x - enemySpeed / fps;
-//        if (enemyMoving == UP && y > 40) {
-//            y = y - enemySpeed / fps;
-//        }
-//
-//
-//        if(enemyMoving == STOPPED && y < screenSizeY -20) {
-//            y = y + enemySpeed / fps;
-//        }
 
-
-//         Update rect which is used to detect hits
         rect.top = y;
         rect.bottom = y + height;
         rect.left = x;
         rect.right = x + length;
-
     }
-
-
-
-
-
-
-
 }
 
 
